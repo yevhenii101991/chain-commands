@@ -16,7 +16,7 @@ class ConsoleOutputLoggerServiceTest extends TestCase
             ->method('info')
             ->with('Some Text here');
 
-        $outputLogger = new ConsoleOutputLoggerService($loggerMock, 32, false, null);
+        $outputLogger = new ConsoleOutputLoggerService($loggerMock, 16, false, null);
         $outputLogger->write('Some Text here');
         $this->assertTrue(true);
     }
