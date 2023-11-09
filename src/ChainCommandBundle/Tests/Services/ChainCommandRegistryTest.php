@@ -4,6 +4,7 @@ namespace App\ChainCommandBundle\Tests\Services;
 
 use App\ChainCommandBundle\Services\ChainCommandRegistry;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Command\Command;
 
 class ChainCommandRegistryTest extends TestCase
 {
@@ -13,51 +14,35 @@ class ChainCommandRegistryTest extends TestCase
     {
         parent::setUp();
         $this->chainRegistry = new ChainCommandRegistry();
+        $commandObject1 = $this->createMock(Command::class);
+        $commandObject1->method('getName')->willReturn('command1');
 
-        $commandObject1 = new class() {
-            public function getName()
-            {
-                return 'command1';
-            }
-        };
+        $commandObject2 = $this->createMock(Command::class);
+        $commandObject2->method('getName')->willReturn('command2');
 
-        $commandObject2 = new class() {
-            public function getName()
-            {
-                return 'command2';
-            }
-        };
+        $commandObject3 = $this->createMock(Command::class);
+        $commandObject3->method('getName')->willReturn('command3');
 
-        $commandObject3 = new class() {
-            public function getName()
-            {
-                return 'command3';
-            }
-        };
-
-        $this->chainRegistry->addCommand($commandObject1, 'master');
-        $this->chainRegistry->addCommand($commandObject2, 'master_test');
-        $this->chainRegistry->addCommand($commandObject3, 'master');
+        $this->chainRegistry->addCommand($commandObject1, 'master:command');
+        $this->chainRegistry->addCommand($commandObject2, 'master_test:command');
+        $this->chainRegistry->addCommand($commandObject3, 'master:command');
     }
 
     public function testGetDependantCommandsName()
     {
         $dependantCommands = $this->chainRegistry->getDependantCommandsName();
 
-        $this->assertEquals(['command1' => 'master', 'command2' => 'master_test', 'command3' => 'master'], $dependantCommands);
+        $this->assertEquals(['command1' => 'master:command', 'command2' => 'master_test:command', 'command3' => 'master:command'], $dependantCommands);
     }
 
     public function testAddCommandToRegistry()
     {
-        $chainRegistry = new ChainCommandRegistry();
-        $chainRegistry->addCommand('command1', 'masterCommand1');
-        $chainRegistry->addCommand('command2', 'masterCommand1');
+        $commands = $this->chainRegistry->getCommands();
 
-        $commands = $chainRegistry->getCommands();
-
-        $this->assertCount(2, $commands);
-        $this->assertEquals(['command' => 'command1', 'master' => 'masterCommand1'], $commands[0]);
-        $this->assertEquals(['command' => 'command2', 'master' => 'masterCommand1'], $commands[1]);
+        $this->assertCount(3, $commands);
+        $this->assertEquals(['command1',  'master:command'], [$commands[0]['command']->getName(), $commands[0]['master']]);
+        $this->assertEquals(['command2',  'master_test:command'], [$commands[1]['command']->getName(), $commands[1]['master']]);
+        $this->assertEquals(['command3',  'master:command'], [$commands[2]['command']->getName(), $commands[2]['master']]);
     }
 
     public function testGetEmptyDependantCommandsName()
@@ -70,7 +55,7 @@ class ChainCommandRegistryTest extends TestCase
 
     public function testGetDependantCommandsByMasterCommandName()
     {
-        $dependantCommands = $this->chainRegistry->getDependantCommands('master');
+        $dependantCommands = $this->chainRegistry->getDependantCommands('master:command');
 
         $this->assertCount(2, $dependantCommands);
         $this->assertEquals(['command1', 'command3'], [$dependantCommands[0]['command']->getName(), $dependantCommands[1]['command']->getName()]);

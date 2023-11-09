@@ -42,6 +42,7 @@ class ConsoleCommandListener
     public function onConsoleTerminate(ConsoleTerminateEvent $event): void
     {
         $this->logger->info(sprintf('Executing %s chain members', $event->getCommand()->getName()));
+
         foreach ($this->chainCommandRegistry->getDependantCommands($event->getCommand()->getName()) as $command) {
             $command['command']->run(new ArrayInput([]), new ConsoleOutputLoggerService($this->logger));
         }

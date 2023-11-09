@@ -2,11 +2,13 @@
 
 namespace App\ChainCommandBundle\Services;
 
+use Symfony\Component\Console\Command\Command;
+
 class ChainCommandRegistry
 {
     private array $commands = [];
 
-    public function addCommand($id, $master): void
+    public function addCommand(Command $id, string $master): void
     {
         $this->commands[] = ['command' => $id, 'master' => $master];
     }

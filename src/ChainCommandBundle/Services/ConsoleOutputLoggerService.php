@@ -11,12 +11,16 @@ use Symfony\Component\Console\Output\ConsoleOutput;
  */
 class ConsoleOutputLoggerService extends ConsoleOutput
 {
-    public function __construct(private LoggerInterface $logger, $verbosity = self::VERBOSITY_NORMAL, $decorated = false, OutputFormatterInterface $formatter = null)
-    {
+    public function __construct(
+        private LoggerInterface $logger,
+        int $verbosity = self::VERBOSITY_NORMAL,
+        bool $decorated = false,
+        OutputFormatterInterface $formatter = null
+    ) {
         parent::__construct($verbosity, $decorated, $formatter);
     }
 
-    public function write($messages, $newline = false, $options = self::OUTPUT_NORMAL)
+    public function write(string|iterable $messages, bool $newline = false, int $options = self::OUTPUT_NORMAL): void
     {
         $this->logger->info($messages);
         parent::write($messages, $newline, $options);
