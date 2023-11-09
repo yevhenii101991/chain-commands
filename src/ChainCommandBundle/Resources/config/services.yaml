@@ -1,0 +1,12 @@
+services:
+  app.chain.command.listener:
+    class: App\ChainCommandBundle\EventListener\ConsoleCommandListener
+    arguments: ['@app.chain.command_registry', '@monolog.logger']
+    tags:
+      - { name: 'kernel.event_listener', event: 'console.command', method: 'onConsoleCommand' }
+      - { name: 'kernel.event_listener', event: 'console.terminate', method: 'onConsoleTerminate' }
+  app.chain.command_registry:
+    class: App\ChainCommandBundle\Services\ChainCommandRegistry
+  app.chain.command_output_logger:
+    class: App\ChainCommandBundle\Services\ConsoleOutputLoggerService
+    arguments: ['@monolog.logger']

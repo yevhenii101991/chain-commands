@@ -1,0 +1,6 @@
+services:
+  bar:hi:
+    class: App\BarBundle\Command\BarHiCommand
+    arguments: ['@app.chain.command_output_logger']
+    tags:
+      - { name: 'console.command', type: 'chain_command', master_command: 'foo:hello' }
